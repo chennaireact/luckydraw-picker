@@ -2,7 +2,7 @@
 
 A clean, presentation-ready lucky draw wheel built with React, Vite, and Framer Motion. Designed for conferences, meetups, and events — with big-screen visibility, smooth animations, and an image-downloadable winner card.
 
-![Lucky Draw Picker](public/chennaireact.webp)
+![Lucky Draw Picker](public/screenshots/mainpage.png)
 
 ## Features
 
@@ -49,11 +49,6 @@ npm run preview
 6. **Save Image** to download a clean winner card PNG
 7. **Draw Again** or start with a **New List**
 
-## Customization
+---
 
-- Swap `public/chennaireact.webp` to update the event logo
-- Footer links to [chennaireact.in](https://chennaireact.in) — update in `src/App.jsx`
-
-## License
-
-MIT
+Made with 💙 by [ChennaiReact](https://chennaireact.in)
