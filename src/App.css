@@ -425,6 +425,7 @@ input, textarea { font-family: inherit; outline: none; }
 
 .reel-item {
   position: absolute; left: 0; right: 0;
+  top: 50%;
   text-align: center; white-space: nowrap;
   will-change: transform, opacity; pointer-events: none;
 }

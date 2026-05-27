@@ -229,28 +229,47 @@ function SpinStep({ names, contestName, spinDuration, onBack, onWinner }) {
     if (isSpinning) return
     setIsSpinning(true)
 
-    const src = [...names]
+    // Pre-select the winner
+    const wName = names[Math.floor(Math.random() * names.length)]
+    winnerRef.current = wName
+
+    // Build the reel with shuffled segments
     const reel = []
-    const rounds = Math.ceil((spinDuration * 1000 - 800) / (ITEM_H * 2))
-    for (let i = 0; i < Math.max(rounds, 40); i++) {
+    const src = [...names]
+    const totalRounds = Math.max(40, Math.ceil((spinDuration * 1000) / (ITEM_H * names.length)))
+    for (let i = 0; i < totalRounds; i++) {
       for (let j = src.length - 1; j > 0; j--) {
         const k = Math.floor(Math.random() * (j + 1));
         [src[j], src[k]] = [src[k], src[j]]
       }
-      reel.push(...src.map(c => c))
+      reel.push(...src)
     }
 
-    const wName = names[Math.floor(Math.random() * names.length)]
-    winnerRef.current = wName
-
-    const landmark = Math.round((spinDuration * 1000 - 800) / (4.5))
-    const wPos = landmark * src.length / ITEM_H + names.indexOf(wName)
+    // Find a target position near the end of the reel where the winner appears,
+    // so the spin animation has enough distance and lands on the correct name
+    let targetIdx = -1
+    const searchStart = Math.max(0, Math.floor(reel.length * 0.75))
+    for (let i = reel.length - 1; i >= searchStart; i--) {
+      if (reel[i] === wName) {
+        targetIdx = i
+        break
+      }
+    }
+    // Fallback: find any occurrence of the winner
+    if (targetIdx === -1) {
+      for (let i = reel.length - 1; i >= 0; i--) {
+        if (reel[i] === wName) {
+          targetIdx = i
+          break
+        }
+      }
+    }
 
     setDisplayItems(reel)
     setScrollPx(0)
     lastTickRef.current = -1
 
-    const target = wPos * ITEM_H
+    const target = targetIdx * ITEM_H
     const duration = spinDuration * 1000
     const t0 = Date.now()
     if (animRef.current) cancelAnimationFrame(animRef.current)
@@ -261,7 +280,7 @@ function SpinStep({ names, contestName, spinDuration, onBack, onWinner }) {
       const px = target * e
       setScrollPx(px)
 
-      const idx = Math.round(px / ITEM_H) % reel.length
+      const idx = Math.round(px / ITEM_H)
       if (idx !== lastTickRef.current) { lastTickRef.current = idx; playTick() }
 
       if (p < 1) {
@@ -324,7 +343,7 @@ function SpinStep({ names, contestName, spinDuration, onBack, onWinner }) {
               {visibleItems.map((item) => (
                 <div key={item.key} className="reel-item"
                   style={{
-                    transform: `translateY(${item.offPx}px) scale(${item.scale})`,
+                    transform: `translateY(${item.offPx - ITEM_H / 2}px) scale(${item.scale})`,
                     opacity: item.opacity
                   }}>
                   <span className={item.isCenter ? 'reel-item-center' : 'reel-item-dim'}>{item.text}</span>
